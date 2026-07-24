@@ -70,7 +70,8 @@ export async function generateExcel(req: Request, res: Response) {
       { header: 'NRO. COMPROBANTE', key: 'nroComprobante', width: 18 },
       { header: 'TOTAL A COBRAR', key: 'totalCobrar', width: 18 },
       { header: 'CANTIDAD DE BULTOS', key: 'cantidadBultos', width: 18 },
-      { header: 'HORARIO_ENTREGA', key: 'horarioEntrega', width: 18 }
+      { header: 'HORARIO_ENTREGA', key: 'horarioEntrega', width: 18 },
+      { header: 'ZONA', key: 'zona', width: 15 },
     ]
 
     // Agregar filas con datos de la API

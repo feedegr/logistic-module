@@ -11,14 +11,14 @@ export interface ShipmentData {
   totalCobrar: number
   cantidadBultos: number
   horarioEntrega: string
+  zona?: string
 }
-
 let cachedCustomers: any[] | null = null
 let cacheTime = 0
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
 
 async function fetchPage(page: number): Promise<{ data: any[]; hasMore: boolean }> {
-  const url = `${config.tango.baseUrl}/api/Aperture/Customer?pageSize=500&pageNumber=${page}`
+  const url = `${config.tango.baseUrl}/api/Aperture/Customer?pageSize=5000&pageNumber=${page}`
 
   const response = await fetch(url, {
     method: 'GET',
@@ -40,58 +40,26 @@ async function fetchPage(page: number): Promise<{ data: any[]; hasMore: boolean 
 
 async function fetchAllCustomers(): Promise<any[]> {
   try {
-    // Verificar cache
     const now = Date.now()
     if (cachedCustomers && now - cacheTime < CACHE_DURATION) {
       console.log('[apiClient] Usando clientes en cache')
       return cachedCustomers
     }
 
-    // Obtener primera página para saber cuántas hay
-    const firstPage = await fetchPage(1)
-    const results = [...firstPage.data]
+    console.log('[apiClient] Trayendo clientes secuencialmente (pageSize=5000)...')
+    const results: any[] = []
+    let page = 1
+    let hasMore = true
 
-    // Si hay más páginas, traerlas en paralelo
-    if (firstPage.hasMore) {
-      console.log('[apiClient] Trayendo todas las páginas en paralelo...')
-
-      // Estimar cuántas páginas hay aproximadamente
-      // Asumimos que cada página tiene 500 registros
-      const promises = []
-      for (let page = 2; page <= 10; page++) {
-        promises.push(
-          fetchPage(page)
-            .then(result => {
-              results.push(...result.data)
-              return result.hasMore
-            })
-            .catch(err => {
-              console.warn(`[apiClient] Error en página ${page}:`, err.message)
-              return false
-            })
-        )
-      }
-
-      const moreResults = await Promise.all(promises)
-
-      // Si aún hay más datos, continuar
-      if (moreResults.some(m => m)) {
-        for (let page = 11; page <= 50; page++) {
-          try {
-            const result = await fetchPage(page)
-            results.push(...result.data)
-            if (!result.hasMore) break
-          } catch (err) {
-            console.warn(`[apiClient] Error en página ${page}, deteniendo`)
-            break
-          }
-        }
-      }
+    while (hasMore) {
+      const result = await fetchPage(page)
+      results.push(...result.data)
+      hasMore = result.hasMore
+      console.log(`[apiClient] Página ${page}: ${result.data.length} clientes`)
+      page++
     }
 
-    console.log(`[apiClient] Traídos ${results.length} clientes`)
-
-    // Cachear resultados
+    console.log(`[apiClient] Traídos ${results.length} clientes totales`)
     cachedCustomers = results
     cacheTime = now
 
@@ -106,19 +74,48 @@ export async function fetchShipmentsByDate(date: string): Promise<ShipmentData[]
   try {
     const customers = await fetchAllCustomers()
 
-    const shipments: ShipmentData[] = customers.map((c: any) => ({
-      codVendedor: c.SellerCode ?? '',
-      codigoCliente: c.Code ?? '',
-      razonSocial: c.BusinessName ?? c.TradeName ?? '',
-      direccion: c.ShippingAddresses?.[0]?.Address ?? c.Address ?? '',
-      localidad: c.ShippingAddresses?.[0]?.City ?? c.City ?? '',
-      tipoComprobante: 'Factura',
-      nroComprobante: c.Code ?? '',
-      totalCobrar: 0,
-      cantidadBultos: 0,
-      horarioEntrega: c.ShippingAddresses?.[0]?.DeliveryHours ?? '09:00 - 17:00',
-    }))
+    // Parsear fecha DD/MM/YYYY
+    const [day, month, year] = date.split('/').map(Number)
+    const deliveryDate = new Date(year, month - 1, day)
+    const dayOfWeek = deliveryDate.getDay()
 
+    // Mapear día de semana a propiedad delivers
+    const daysMap = [
+      'DeliversSunday',
+      'DeliversMonday',
+      'DeliversTuesday',
+      'DeliversWednesday',
+      'DeliversThursday',
+      'DeliversFriday',
+      'DeliversSaturday'
+    ]
+    const deliveryProperty = daysMap[dayOfWeek]
+
+    const shipments: ShipmentData[] = []
+
+    customers.forEach((c: any) => {
+      const shippingAddresses = c.ShippingAddresses ?? []
+
+      shippingAddresses.forEach((shipping: any) => {
+        const deliveryValue = shipping[deliveryProperty]
+        if (deliveryValue === 'S') {
+          shipments.push({
+            codVendedor: c.SellerCode ?? '',
+            codigoCliente: c.Code ?? '',
+            razonSocial: c.BusinessName ?? c.TradeName ?? '',
+            direccion: shipping.Address ?? '',
+            localidad: shipping.City ?? '',
+            tipoComprobante: 'Factura',
+            nroComprobante: c.Code ?? '',
+            totalCobrar: 0,
+            cantidadBultos: 0,
+            horarioEntrega: shipping.DeliveryHours ?? '09:00 - 17:00',
+          })
+        }
+      })
+    })
+
+    console.log(`[apiClient] Clientes para ${date}: ${shipments.length} de ${customers.length} total`)
     return shipments
   } catch (error) {
     console.error('[apiClient] Error fetching shipments:', error)
