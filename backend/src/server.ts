@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import { config, validateConfig } from './config.js'
 import excelRoutes from './routes/excel.js'
+import { runMigrations } from './db/migrate.js'
 
 const app = express()
 
@@ -15,7 +16,14 @@ app.get('/health', (_req, res) => {
 
 app.use('/excel', excelRoutes)
 
-app.listen(config.port, () => {
-  console.log(`[server] escuchando en :${config.port}`)
-  validateConfig()
-})
+runMigrations()
+  .then(() => {
+    app.listen(config.port, () => {
+      console.log(`[server] escuchando en :${config.port}`)
+      validateConfig()
+    })
+  })
+  .catch((err) => {
+    console.error('[startup] error en migraciones:', err)
+    process.exit(1)
+  })
