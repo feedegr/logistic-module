@@ -45,6 +45,36 @@ logistic-module/
 └── README.md
 ```
 
+## ⚠️ PRIORITARIO: el backend necesita Postgres para arrancar
+
+Desde que se agregó `backend/src/db/` (migraciones), `server.ts` corre
+`runMigrations()` **antes** de abrir el puerto — si no hay conexión a
+Postgres, el server no levanta (`process.exit(1)`), aunque los endpoints
+de Excel (`/excel/preview`, `/excel/generate`) no usan la base de datos
+para nada todavía.
+
+En producción esa base la provee `docker-compose.yml` de `hdo-selling-module`
+(Postgres compartido con Chatwoot/bot, base `oasisbot`). Para **desarrollo
+local fuera de ese compose**, se usa un contenedor Postgres standalone
+descartable:
+
+```bash
+docker run --name oasis-pg -e POSTGRES_PASSWORD=dev_local_only \
+  -e POSTGRES_DB=oasisbot -p 5433:5432 -d postgres:16
+```
+
+Nota: puerto **5433** en el host (no 5432), porque ese suele estar
+ocupado por el Postgres de otro proyecto (`employeeexperience-db-1`).
+Si el contenedor `oasis-pg` ya existe, alcanza con `docker start oasis-pg`.
+
+`backend/.env` debe tener:
+```
+DATABASE_URL=postgres://postgres:dev_local_only@localhost:5433/oasisbot
+```
+
+(`backend/.env.example` sigue apuntando a `localhost:5432` como plantilla
+genérica; en este entorno local usar 5433 como arriba.)
+
 ## Configuración Inicial
 
 ### 1. Clonar y preparar
@@ -59,6 +89,7 @@ cp .env.example .env
 # Completar .env con:
 # PORT=3000
 # NODE_ENV=development
+# DATABASE_URL=postgres://postgres:dev_local_only@localhost:5433/oasisbot  (ver sección arriba)
 # TANGO_API_BASE_URL=https://tiendas.axoft.com
 # TANGO_ACCESS_TOKEN=<tu-token-aqui>
 # TANGO_PAGE_SIZE=500
