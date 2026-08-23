@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import ExcelGenerator from './components/ExcelGenerator'
 import './App.css'
 
