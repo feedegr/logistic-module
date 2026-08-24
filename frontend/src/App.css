@@ -34,6 +34,10 @@
   transition: all 0.2s ease;
 }
 
+.tabs .tab:first-child {
+  display: none;
+}
+
 .tab:hover {
   background: rgba(255, 255, 255, 0.9);
 }

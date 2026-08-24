@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import ExcelGenerator from './components/ExcelGenerator'
 import DeudasView from './components/DeudasView'
 import './App.css'
@@ -5,7 +6,7 @@ import './App.css'
 type Tab = 'envios' | 'deudas'
 
 function App() {
-  const [tab, setTab] = useState<Tab>('envios')
+  const [tab, setTab] = useState<Tab>('deudas')
 
   return (
     <div className="app">
@@ -21,7 +22,7 @@ function App() {
             className={`tab ${tab === 'deudas' ? 'tab-active' : ''}`}
             onClick={() => setTab('deudas')}
           >
-            💰 Deudas
+            💰 Cobranzas
           </button>
         </div>
 
