@@ -31,7 +31,7 @@ async function fetchPage(page: number): Promise<{ data: any[]; hasMore: boolean 
     throw new Error(`Tango API error (${response.status})`)
   }
 
-  const body = await response.json()
+  const body = await response.json() as any
   return {
     data: body.Data ?? [],
     hasMore: body.Paging?.MoreData ?? false,
