@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import { config, validateConfig } from './config.js'
 import excelRoutes from './routes/excel.js'
+import debtsRoutes from './routes/debts.js'
 import { runMigrations } from './db/migrate.js'
 
 const app = express()
@@ -15,15 +16,15 @@ app.get('/health', (_req, res) => {
 })
 
 app.use('/excel', excelRoutes)
+app.use('/debts', debtsRoutes)
 
 runMigrations()
-  .then(() => {
+  .catch((err) => {
+    console.error('[startup] no se pudo conectar a Postgres, arrancando igual (ningún endpoint la usa todavía):', err.message)
+  })
+  .finally(() => {
     app.listen(config.port, () => {
       console.log(`[server] escuchando en :${config.port}`)
       validateConfig()
     })
-  })
-  .catch((err) => {
-    console.error('[startup] error en migraciones:', err)
-    process.exit(1)
   })

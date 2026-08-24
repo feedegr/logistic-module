@@ -9,6 +9,13 @@ export const config = {
     accessToken: process.env.TANGO_ACCESS_TOKEN ?? '',
     pageSize: Number(process.env.TANGO_PAGE_SIZE ?? 5000),
   },
+  axoft: {
+    baseUrl: process.env.AXOFT_API_BASE_URL ?? 'https://058430-001.connect.axoft.com/Api/GetApiLiveQueryData',
+    apiKey: process.env.AXOFT_API_KEY ?? '',
+    company: process.env.AXOFT_COMPANY ?? '136',
+    processClientes: process.env.AXOFT_PROCESS_CLIENTES ?? '17961',
+    processDeudas: process.env.AXOFT_PROCESS_DEUDAS ?? '17952',
+  },
 }
 
 export function validateConfig(): void {
@@ -17,6 +24,7 @@ export function validateConfig(): void {
   if (!config.database.url) missing.push('DATABASE_URL')
   if (!config.tango.baseUrl) missing.push('TANGO_API_BASE_URL')
   if (!config.tango.accessToken) missing.push('TANGO_ACCESS_TOKEN')
+  if (!config.axoft.apiKey) missing.push('AXOFT_API_KEY')
 
   if (missing.length > 0) {
     console.warn(

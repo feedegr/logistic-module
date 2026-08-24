@@ -1,0 +1,59 @@
+.deudas-filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.deudas-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.deudas-filter-field label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #203d35;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.deudas-filter-field input[type='date'] {
+  padding: 10px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.deudas-search {
+  margin-bottom: 16px;
+}
+
+.deudas-search input {
+  width: 100%;
+  max-width: 360px;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.deudas-search input:focus {
+  outline: none;
+  border-color: #203d35;
+}
+
+.deudas-total {
+  font-weight: 700;
+  color: #203d35;
+}
+
+.deudas-error {
+  color: #b02a2a;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
