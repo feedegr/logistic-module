@@ -5,6 +5,7 @@ import { config, validateConfig } from './config.js'
 import excelRoutes from './routes/excel.js'
 import debtsRoutes from './routes/debts.js'
 import contactsRoutes from './routes/contacts.js'
+import botHealthRoutes from './routes/botHealth.js'
 import { runMigrations } from './db/migrate.js'
 import pool from './db/pool.js'
 
@@ -27,6 +28,7 @@ app.get('/health', async (_req, res) => {
 app.use('/excel', excelRoutes)
 app.use('/debts', debtsRoutes)
 app.use('/contacts', contactsRoutes)
+app.use('/bot-health', botHealthRoutes)
 
 runMigrations()
   .catch((err) => {

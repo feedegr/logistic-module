@@ -1,39 +1,44 @@
 import { useEffect, useRef, useState } from 'react'
 import './HealthStatus.css'
 
-type Status = 'checking' | 'ok' | 'degraded' | 'down'
+interface CheckResult {
+  ok: boolean
+  status?: number
+  error?: string
+}
+
+interface BotHealth {
+  server: CheckResult
+  gemini: CheckResult
+}
 
 const POLL_INTERVAL_MS = 30_000
 
-const LABELS: Record<Status, string> = {
-  checking: 'Verificando...',
-  ok: 'Backend y base de datos OK',
-  degraded: 'Backend arriba, base de datos no responde',
-  down: 'Backend no responde',
+function dotClass(result: CheckResult | null): string {
+  if (!result) return 'health-dot-checking'
+  return result.ok ? 'health-dot-ok' : 'health-dot-down'
+}
+
+function dotTitle(result: CheckResult | null): string {
+  if (!result) return 'Verificando...'
+  if (result.ok) return `Status ${result.status ?? 200}`
+  return result.error ?? (result.status ? `Status ${result.status}` : 'No responde')
 }
 
 export default function HealthStatus() {
-  const [status, setStatus] = useState<Status>('checking')
-  const [detail, setDetail] = useState('')
-  const [lastChecked, setLastChecked] = useState<Date | null>(null)
+  const [health, setHealth] = useState<BotHealth | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const check = async () => {
     try {
-      const res = await fetch('/api/health')
-      if (res.ok) {
-        setStatus('ok')
-        setDetail('')
-      } else {
-        const body = await res.json().catch(() => null)
-        setStatus('degraded')
-        setDetail(body?.error ?? `HTTP ${res.status}`)
-      }
-    } catch (err) {
-      setStatus('down')
-      setDetail(err instanceof Error ? err.message : 'No se pudo contactar al backend')
-    } finally {
-      setLastChecked(new Date())
+      const res = await fetch('/api/bot-health')
+      const data = await res.json()
+      setHealth(data)
+    } catch {
+      setHealth({
+        server: { ok: false, error: 'No se pudo contactar al backend' },
+        gemini: { ok: false, error: 'No se pudo contactar al backend' },
+      })
     }
   }
 
@@ -68,15 +73,16 @@ export default function HealthStatus() {
     }
   }, [])
 
-  const parts = [LABELS[status]]
-  if (detail) parts.push(detail)
-  if (lastChecked) parts.push(`última verificación ${lastChecked.toLocaleTimeString('es-AR')}`)
-  const title = parts.join(' — ')
-
   return (
-    <div className="health-status" title={title}>
-      <span className={`health-dot health-dot-${status}`} />
-      <span className="health-label">{LABELS[status]}</span>
+    <div className="health-status">
+      <span className="health-item" title={dotTitle(health?.server ?? null)}>
+        <span className={`health-dot ${dotClass(health?.server ?? null)}`} />
+        <span className="health-label">Server</span>
+      </span>
+      <span className="health-item" title={dotTitle(health?.gemini ?? null)}>
+        <span className={`health-dot ${dotClass(health?.gemini ?? null)}`} />
+        <span className="health-label">Gemini</span>
+      </span>
     </div>
   )
 }
