@@ -4,6 +4,7 @@ import cors from 'cors'
 import { config, validateConfig } from './config.js'
 import excelRoutes from './routes/excel.js'
 import debtsRoutes from './routes/debts.js'
+import contactsRoutes from './routes/contacts.js'
 import { runMigrations } from './db/migrate.js'
 
 const app = express()
@@ -17,6 +18,7 @@ app.get('/health', (_req, res) => {
 
 app.use('/excel', excelRoutes)
 app.use('/debts', debtsRoutes)
+app.use('/contacts', contactsRoutes)
 
 runMigrations()
   .catch((err) => {
