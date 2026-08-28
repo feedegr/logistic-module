@@ -17,7 +17,12 @@
 
 .tabs {
   display: flex;
+  align-items: center;
   gap: 8px;
+}
+
+.tabs-spacer {
+  flex: 1;
 }
 
 .tab {

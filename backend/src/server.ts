@@ -6,14 +6,22 @@ import excelRoutes from './routes/excel.js'
 import debtsRoutes from './routes/debts.js'
 import contactsRoutes from './routes/contacts.js'
 import { runMigrations } from './db/migrate.js'
+import pool from './db/pool.js'
 
 const app = express()
 
 app.use(cors())
 app.use(express.json())
 
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', service: 'hierbas-del-oasis-backend' })
+app.get('/health', async (_req, res) => {
+  try {
+    await pool.query('SELECT 1')
+    res.json({ status: 'ok', service: 'hierbas-del-oasis-backend', db: 'up' })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[health] DB no responde:', message)
+    res.status(503).json({ status: 'degraded', service: 'hierbas-del-oasis-backend', db: 'down', error: message })
+  }
 })
 
 app.use('/excel', excelRoutes)
