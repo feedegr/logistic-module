@@ -9,7 +9,7 @@ interface CheckResult {
 
 interface BotHealth {
   server: CheckResult
-  gemini: CheckResult
+  ia: CheckResult
 }
 
 const POLL_INTERVAL_MS = 30_000
@@ -37,7 +37,7 @@ export default function HealthStatus() {
     } catch {
       setHealth({
         server: { ok: false, error: 'No se pudo contactar al backend' },
-        gemini: { ok: false, error: 'No se pudo contactar al backend' },
+        ia: { ok: false, error: 'No se pudo contactar al backend' },
       })
     }
   }
@@ -77,11 +77,11 @@ export default function HealthStatus() {
     <div className="health-status">
       <span className="health-item" title={dotTitle(health?.server ?? null)}>
         <span className={`health-dot ${dotClass(health?.server ?? null)}`} />
-        <span className="health-label">Server</span>
+        <span className="health-label">Bot</span>
       </span>
-      <span className="health-item" title={dotTitle(health?.gemini ?? null)}>
-        <span className={`health-dot ${dotClass(health?.gemini ?? null)}`} />
-        <span className="health-label">Gemini</span>
+      <span className="health-item" title={dotTitle(health?.ia ?? null)}>
+        <span className={`health-dot ${dotClass(health?.ia ?? null)}`} />
+        <span className="health-label">IA</span>
       </span>
     </div>
   )

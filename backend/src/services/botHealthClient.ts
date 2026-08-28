@@ -24,10 +24,10 @@ async function checkEndpoint(path: string): Promise<HealthCheckResult> {
   }
 }
 
-export async function fetchBotHealth(): Promise<{ server: HealthCheckResult; gemini: HealthCheckResult }> {
-  const [server, gemini] = await Promise.all([
+export async function fetchBotHealth(): Promise<{ server: HealthCheckResult; ia: HealthCheckResult }> {
+  const [server, ia] = await Promise.all([
     checkEndpoint('/health'),
-    checkEndpoint('/health/gemini'),
+    checkEndpoint('/health/ia'),
   ])
-  return { server, gemini }
+  return { server, ia }
 }
