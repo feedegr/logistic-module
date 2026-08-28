@@ -33,14 +33,25 @@
   margin-bottom: 16px;
 }
 
+.clientes-save-error {
+  color: #b02a2a;
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Días */
 .clientes-days {
   display: flex;
   gap: 4px;
 }
 
+.clientes-days-modal {
+  margin-top: 6px;
+}
+
 .clientes-day {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,9 +60,203 @@
   font-weight: 700;
   background: #f0f0f0;
   color: #bbb;
+  user-select: none;
 }
 
 .clientes-day-active {
   background: #ebd38e;
   color: #203d35;
+}
+
+.clientes-day-clickable {
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.clientes-day-clickable:hover {
+  transform: scale(1.15);
+}
+
+/* Badge lista de precios */
+.clientes-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #f0f0f0;
+  color: #aaa;
+}
+
+.clientes-badge-active {
+  background: #203d35;
+  color: #ebd38e;
+}
+
+/* Código cliente */
+.clientes-code {
+  font-family: monospace;
+  font-size: 13px;
+  color: #555;
+}
+
+/* Fila en edición */
+.clientes-row-editing {
+  background: #f9f6e8;
+}
+
+/* Inputs dentro de la tabla */
+.clientes-input {
+  padding: 6px 10px;
+  border: 1px solid #203d35;
+  border-radius: 8px;
+  font-size: 13px;
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 120px;
+}
+
+.clientes-input-sm {
+  min-width: 90px;
+}
+
+.clientes-select {
+  padding: 6px 10px;
+  border: 1px solid #203d35;
+  border-radius: 8px;
+  font-size: 13px;
+  background: white;
+  cursor: pointer;
+}
+
+/* Botones de acción */
+.clientes-actions {
+  white-space: nowrap;
+}
+
+.clientes-action-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-add {
+  background: #203d35;
+  color: #ebd38e;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+
+.btn-add:hover {
+  background: #2d5a50;
+}
+
+.btn-edit {
+  background: transparent;
+  color: #203d35;
+  border: 1px solid #203d35;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-edit:hover {
+  background: #f0f4f0;
+}
+
+.btn-save {
+  background: #203d35;
+  color: #ebd38e;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btn-cancel {
+  background: transparent;
+  color: #666;
+  border: 1px solid #ccc;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Modal */
+.clientes-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.clientes-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  width: 480px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+}
+
+.clientes-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #203d35;
+  margin: 0 0 24px;
+}
+
+.clientes-modal-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.clientes-modal-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+}
+
+.clientes-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.clientes-modal-actions .btn-save {
+  padding: 10px 20px;
+  font-size: 13px;
+}
+
+.clientes-modal-actions .btn-cancel {
+  padding: 10px 20px;
+  font-size: 13px;
 }
