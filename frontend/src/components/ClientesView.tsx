@@ -5,6 +5,7 @@ interface Contact {
   id: number
   tangoId: string
   name: string
+  phoneNormalized: string
   address: string | null
   city: string | null
   priceListNumber: string | null
@@ -129,7 +130,7 @@ export default function ClientesView() {
     const q = search.trim().toUpperCase()
     if (!q) return contacts
     return contacts.filter((c) =>
-      [c.name, c.tangoId, c.address ?? '', c.city ?? ''].join(' ').toUpperCase().includes(q)
+      [c.name, c.tangoId, c.phoneNormalized, c.address ?? '', c.city ?? ''].join(' ').toUpperCase().includes(q)
     )
   }, [contacts, search])
 
@@ -254,6 +255,7 @@ export default function ClientesView() {
                   <tr>
                     <th>RAZÓN SOCIAL</th>
                     <th>CÓDIGO</th>
+                    <th>TELÉFONO</th>
                     <th>DIRECCIÓN</th>
                     <th>CIUDAD</th>
                     <th>LISTA</th>
@@ -272,6 +274,7 @@ export default function ClientesView() {
                             : c.name}
                         </td>
                         <td className="clientes-code">{c.tangoId}</td>
+                        <td>{c.phoneNormalized || '—'}</td>
                         <td>
                           {isEditing
                             ? <input className="clientes-input" value={editState!.address} onChange={(e) => setEditState({ ...editState!, address: e.target.value })} />

@@ -3,7 +3,6 @@ import { config } from '../config.js'
 export interface ClienteDeuda {
   codCliente: string | null
   razonSocial: string
-  telefono: string
   cantidadComprobantes: number
   deudaTotal: number
 }
@@ -110,7 +109,6 @@ export async function fetchDeudasPorCliente(fromDate: string, toDate: string): P
       deudaPorRazonSocial.set(key, {
         codCliente: cliente ? Array.from(cliente.codigos).join(' / ') : null,
         razonSocial: cliente?.razonSocial ?? comprobante.RAZON_SOCIAL,
-        telefono: comprobante.TELEFONO ?? '',
         cantidadComprobantes: 1,
         deudaTotal: comprobante.IMPORTE_PENDIENTE_CTE,
       })

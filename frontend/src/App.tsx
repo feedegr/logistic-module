@@ -8,7 +8,7 @@ import './App.css'
 type Tab = 'envios' | 'deudas' | 'clientes'
 
 function App() {
-  const [tab, setTab] = useState<Tab>('deudas')
+  const [tab, setTab] = useState<Tab>('clientes')
 
   return (
     <div className="app">
