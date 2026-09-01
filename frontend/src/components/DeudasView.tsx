@@ -4,6 +4,7 @@ import './DeudasView.css'
 interface ClienteDeuda {
   codCliente: string | null
   razonSocial: string
+  telefono: string
   cantidadComprobantes: number
   deudaTotal: number
 }
@@ -131,6 +132,7 @@ export default function DeudasView() {
                   <tr>
                     <th>COD. CLIENTE</th>
                     <th>RAZÓN SOCIAL</th>
+                    <th>TELÉFONO</th>
                     <th>CANT. COMPROBANTES</th>
                     <th>DEUDA TOTAL</th>
                   </tr>
@@ -140,6 +142,7 @@ export default function DeudasView() {
                     <tr key={i}>
                       <td>{d.codCliente ?? '—'}</td>
                       <td>{d.razonSocial}</td>
+                      <td>{d.telefono || '—'}</td>
                       <td>{d.cantidadComprobantes}</td>
                       <td className="deudas-total">{currencyFormatter.format(d.deudaTotal)}</td>
                     </tr>
