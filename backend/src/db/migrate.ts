@@ -37,6 +37,11 @@ export async function runMigrations(): Promise<void> {
       )
     `)
 
+    await pool.query(`
+      ALTER TABLE IF EXISTS contacts
+        ADD COLUMN IF NOT EXISTS billing_condition TEXT;
+    `)
+
     console.log('[db] migraciones completadas')
   } catch (err) {
     console.error('[db] error en migraciones:', err)

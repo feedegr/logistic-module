@@ -8,6 +8,7 @@ interface Contact {
   phoneNormalized: string
   address: string | null
   city: string | null
+  billingCondition: string | null
   priceListNumber: string | null
   deliversMonday: boolean
   deliversTuesday: boolean
@@ -22,6 +23,7 @@ interface EditState {
   name: string
   address: string
   city: string
+  billingCondition: string
   priceListNumber: string
   deliversMonday: boolean
   deliversTuesday: boolean
@@ -49,6 +51,30 @@ const PRICE_LIST_OPTIONS = [
   { value: '400', label: 'D+' },
 ]
 
+const BILLING_CONDITION_OPTIONS = [
+  { value: '', label: '—' },
+  { value: 'RI', label: 'RI - Responsable Inscripto' },
+  { value: 'MT', label: 'MT - Monotributo' },
+  { value: 'CF', label: 'CF - Consumidor Final' },
+  { value: 'EX', label: 'EX - Exento' },
+]
+
+function normalizeBillingCondition(value: string | null | undefined): string {
+  const raw = (value ?? '').trim().toUpperCase()
+  if (!raw) return ''
+  if (raw === 'RESPONSABLE INSCRIPTO' || raw === 'RI') return 'RI'
+  if (raw === 'MONOTRIBUTO' || raw === 'MT') return 'MT'
+  if (raw === 'CONSUMIDOR FINAL' || raw === 'CF') return 'CF'
+  if (raw === 'EXENTO' || raw === 'EX') return 'EX'
+  return raw
+}
+
+function billingConditionLabel(value: string | null | undefined): string {
+  const normalized = normalizeBillingCondition(value)
+  const option = BILLING_CONDITION_OPTIONS.find((item) => item.value === normalized)
+  return option ? option.label : normalized || '—'
+}
+
 function priceLabel(pl: string | null) {
   if (!pl) return '—'
   if (pl === '100' || pl === '101') return 'C'
@@ -66,6 +92,7 @@ function toEditState(c: Contact): EditState {
     name: c.name,
     address: c.address ?? '',
     city: c.city ?? '',
+    billingCondition: normalizeBillingCondition(c.billingCondition),
     priceListNumber: pl,
     deliversMonday: c.deliversMonday,
     deliversTuesday: c.deliversTuesday,
@@ -83,6 +110,7 @@ const EMPTY_NEW = {
   phoneNormalized: '',
   address: '',
   city: '',
+  billingCondition: '',
   priceListNumber: '',
   deliversMonday: false,
   deliversTuesday: false,
@@ -98,6 +126,7 @@ export default function ClientesView() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
+  const [billingConditionFilter, setBillingConditionFilter] = useState('TODAS')
 
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editState, setEditState] = useState<EditState | null>(null)
@@ -116,7 +145,7 @@ export default function ClientesView() {
       const res = await fetch('/api/contacts')
       if (!res.ok) throw new Error()
       const data = await res.json()
-      setContacts(data.contacts)
+      setContacts(Array.isArray(data.contacts) ? data.contacts : [])
     } catch {
       setError('No se pudo obtener la información de clientes')
     } finally {
@@ -126,13 +155,22 @@ export default function ClientesView() {
 
   useEffect(() => { cargarClientes() }, [])
 
+  const billingConditionOptions = useMemo(() => {
+    const values = contacts
+      .map((c) => normalizeBillingCondition(c.billingCondition))
+      .filter((value) => Boolean(value))
+    return Array.from(new Set(values)).sort((a, b) => a.localeCompare(b))
+  }, [contacts])
+
   const contactsFiltrados = useMemo(() => {
     const q = search.trim().toUpperCase()
-    if (!q) return contacts
-    return contacts.filter((c) =>
-      [c.name, c.tangoId, c.phoneNormalized, c.address ?? '', c.city ?? ''].join(' ').toUpperCase().includes(q)
-    )
-  }, [contacts, search])
+    return contacts.filter((c) => {
+      const normalizedBilling = normalizeBillingCondition(c.billingCondition)
+      const matchesSearch = !q || [c.name, c.tangoId, c.phoneNormalized, c.address ?? '', c.city ?? '', normalizedBilling].join(' ').toUpperCase().includes(q)
+      const matchesBilling = billingConditionFilter === 'TODAS' || normalizedBilling === billingConditionFilter
+      return matchesSearch && matchesBilling
+    })
+  }, [contacts, search, billingConditionFilter])
 
   const startEdit = (c: Contact) => {
     setEditingId(c.id)
@@ -163,6 +201,7 @@ export default function ClientesView() {
           name: editState.name || undefined,
           address: editState.address || null,
           city: editState.city || null,
+          billingCondition: editState.billingCondition || null,
           priceListNumber: editState.priceListNumber || null,
           deliversMonday: editState.deliversMonday,
           deliversTuesday: editState.deliversTuesday,
@@ -203,6 +242,7 @@ export default function ClientesView() {
           ...newContact,
           address: newContact.address || null,
           city: newContact.city || null,
+          billingCondition: newContact.billingCondition || null,
           priceListNumber: newContact.priceListNumber || null,
         }),
       })
@@ -231,10 +271,26 @@ export default function ClientesView() {
         <div className="clientes-toolbar">
           <input
             type="text"
-            placeholder="Buscar por razón social, código, dirección, ciudad..."
+            placeholder="Buscar por razón social, código, dirección, ciudad, condición de facturación..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+          <select
+            className="clientes-select"
+            value={billingConditionFilter}
+            onChange={(e) => setBillingConditionFilter(e.target.value)}
+            aria-label="Filtrar por condición de facturación"
+          >
+            <option value="TODAS">Todas</option>
+            {BILLING_CONDITION_OPTIONS.filter((option) => option.value).map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+            {billingConditionOptions
+              .filter((value) => !BILLING_CONDITION_OPTIONS.some((option) => option.value === value))
+              .map((value) => (
+                <option key={value} value={value}>{value}</option>
+              ))}
+          </select>
           <button className="btn btn-primary" onClick={cargarClientes} disabled={loading}>
             {loading ? 'CARGANDO...' : '🔄 ACTUALIZAR'}
           </button>
@@ -258,6 +314,7 @@ export default function ClientesView() {
                     <th>TELÉFONO</th>
                     <th>DIRECCIÓN</th>
                     <th>CIUDAD</th>
+                    <th>CONDICIÓN FACTURACIÓN</th>
                     <th>LISTA</th>
                     <th>DÍAS DE ENTREGA</th>
                     <th></th>
@@ -284,6 +341,15 @@ export default function ClientesView() {
                           {isEditing
                             ? <input className="clientes-input clientes-input-sm" value={editState!.city} onChange={(e) => setEditState({ ...editState!, city: e.target.value })} />
                             : (c.city ?? '—')}
+                        </td>
+                        <td>
+                          {isEditing
+                            ? (
+                              <select className="clientes-select" value={editState!.billingCondition} onChange={(e) => setEditState({ ...editState!, billingCondition: normalizeBillingCondition(e.target.value) })}>
+                                {BILLING_CONDITION_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                              </select>
+                            )
+                            : billingConditionLabel(c.billingCondition)}
                         </td>
                         <td>
                           {isEditing
@@ -351,6 +417,11 @@ export default function ClientesView() {
               </label>
               <label>Ciudad
                 <input className="clientes-input" placeholder="Ej: Buenos Aires" value={newContact.city} onChange={(e) => setNewContact({ ...newContact, city: e.target.value })} />
+              </label>
+              <label>Condición de facturación
+                <select className="clientes-select" value={newContact.billingCondition} onChange={(e) => setNewContact({ ...newContact, billingCondition: normalizeBillingCondition(e.target.value) })}>
+                  {BILLING_CONDITION_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                </select>
               </label>
               <label>Lista de precios
                 <select className="clientes-select" value={newContact.priceListNumber} onChange={(e) => setNewContact({ ...newContact, priceListNumber: e.target.value })}>
