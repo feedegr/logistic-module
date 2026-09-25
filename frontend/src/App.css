@@ -52,3 +52,12 @@
   color: white;
   box-shadow: 0 2px 8px rgba(32, 61, 53, 0.2);
 }
+
+.tab-logout {
+  background: transparent;
+  color: #a04040;
+}
+
+.tab-logout:hover {
+  background: rgba(160, 64, 64, 0.1);
+}

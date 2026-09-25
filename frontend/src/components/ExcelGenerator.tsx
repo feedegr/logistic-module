@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { apiFetch } from '../api'
 import './ExcelGenerator.css'
 
 function getNextBusinessDay(): Date {
@@ -38,7 +39,7 @@ export default function ExcelGenerator() {
   const handleGenerate = async () => {
     try {
       const date = formatDate(nextDay)
-      const response = await fetch('/api/excel/preview', {
+      const response = await apiFetch('/api/excel/preview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date })
@@ -58,7 +59,7 @@ export default function ExcelGenerator() {
   const handleDownload = async () => {
     try {
       const date = formatDate(nextDay)
-      const response = await fetch('/api/excel/generate', {
+      const response = await apiFetch('/api/excel/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date })

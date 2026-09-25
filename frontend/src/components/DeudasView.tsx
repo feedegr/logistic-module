@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { apiFetch } from '../api'
 import './DeudasView.css'
 
 interface ClienteDeuda {
@@ -41,7 +42,7 @@ export default function DeudasView() {
     setLoading(true)
     setError('')
     try {
-      const response = await fetch('/api/debts', {
+      const response = await apiFetch('/api/debts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

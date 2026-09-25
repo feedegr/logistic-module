@@ -42,6 +42,17 @@ export async function runMigrations(): Promise<void> {
         ADD COLUMN IF NOT EXISTS billing_condition TEXT;
     `)
 
+    // Usuarios de acceso al sistema. No hay endpoint para crearlos: se crean
+    // a mano con "npm run create-user -- <usuario> <contraseña>".
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(100) UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
+
     console.log('[db] migraciones completadas')
   } catch (err) {
     console.error('[db] error en migraciones:', err)

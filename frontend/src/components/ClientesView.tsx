@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { apiFetch } from '../api'
 import './ClientesView.css'
 
 interface Contact {
@@ -142,7 +143,7 @@ export default function ClientesView() {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('/api/contacts')
+      const res = await apiFetch('/api/contacts')
       if (!res.ok) throw new Error()
       const data = await res.json()
       setContacts(Array.isArray(data.contacts) ? data.contacts : [])
@@ -194,7 +195,7 @@ export default function ClientesView() {
     setSaving(true)
     setSaveError('')
     try {
-      const res = await fetch(`/api/contacts/${editingId}`, {
+      const res = await apiFetch(`/api/contacts/${editingId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -235,7 +236,7 @@ export default function ClientesView() {
     setCreating(true)
     setCreateError('')
     try {
-      const res = await fetch('/api/contacts', {
+      const res = await apiFetch('/api/contacts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { apiFetch } from '../api'
 import './HealthStatus.css'
 
 interface CheckResult {
@@ -31,7 +32,7 @@ export default function HealthStatus() {
 
   const check = async () => {
     try {
-      const res = await fetch('/api/bot-health')
+      const res = await apiFetch('/api/bot-health')
       const data = await res.json()
       setHealth(data)
     } catch {

@@ -3,12 +3,24 @@ import ExcelGenerator from './components/ExcelGenerator'
 import DeudasView from './components/DeudasView'
 import ClientesView from './components/ClientesView'
 import HealthStatus from './components/HealthStatus'
+import LoginView from './components/LoginView'
+import { clearToken, getToken } from './api'
 import './App.css'
 
 type Tab = 'envios' | 'deudas' | 'clientes'
 
 function App() {
   const [tab, setTab] = useState<Tab>('clientes')
+  const [authed, setAuthed] = useState(() => Boolean(getToken()))
+
+  if (!authed) {
+    return <LoginView onLogin={() => setAuthed(true)} />
+  }
+
+  const handleLogout = () => {
+    clearToken()
+    setAuthed(false)
+  }
 
   return (
     <div className="app">
@@ -34,6 +46,9 @@ function App() {
           </button>
           <div className="tabs-spacer" />
           <HealthStatus />
+          <button className="tab tab-logout" onClick={handleLogout}>
+            🚪 Salir
+          </button>
         </div>
 
         {tab === 'envios' && <ExcelGenerator />}

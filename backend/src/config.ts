@@ -16,6 +16,9 @@ export const config = {
     processClientes: process.env.AXOFT_PROCESS_CLIENTES ?? '17961',
     processDeudas: process.env.AXOFT_PROCESS_DEUDAS ?? '17952',
   },
+  auth: {
+    jwtSecret: process.env.JWT_SECRET ?? '',
+  },
 }
 
 export function validateConfig(): void {
@@ -25,6 +28,7 @@ export function validateConfig(): void {
   if (!config.tango.baseUrl) missing.push('TANGO_API_BASE_URL')
   if (!config.tango.accessToken) missing.push('TANGO_ACCESS_TOKEN')
   if (!config.axoft.apiKey) missing.push('AXOFT_API_KEY')
+  if (!config.auth.jwtSecret) missing.push('JWT_SECRET')
 
   if (missing.length > 0) {
     console.warn(
