@@ -22,6 +22,7 @@ interface Contact {
 
 interface EditState {
   name: string
+  phoneNormalized: string
   address: string
   city: string
   billingCondition: string
@@ -91,6 +92,7 @@ function toEditState(c: Contact): EditState {
   if (pl === '401') pl = '400'
   return {
     name: c.name,
+    phoneNormalized: c.phoneNormalized,
     address: c.address ?? '',
     city: c.city ?? '',
     billingCondition: normalizeBillingCondition(c.billingCondition),
@@ -200,6 +202,7 @@ export default function ClientesView() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: editState.name || undefined,
+          phoneNormalized: editState.phoneNormalized || undefined,
           address: editState.address || null,
           city: editState.city || null,
           billingCondition: editState.billingCondition || null,
@@ -332,7 +335,11 @@ export default function ClientesView() {
                             : c.name}
                         </td>
                         <td className="clientes-code">{c.tangoId}</td>
-                        <td>{c.phoneNormalized || '—'}</td>
+                        <td>
+                          {isEditing
+                            ? <input className="clientes-input clientes-input-sm" value={editState!.phoneNormalized} onChange={(e) => setEditState({ ...editState!, phoneNormalized: e.target.value })} />
+                            : (c.phoneNormalized || '—')}
+                        </td>
                         <td>
                           {isEditing
                             ? <input className="clientes-input" value={editState!.address} onChange={(e) => setEditState({ ...editState!, address: e.target.value })} />
