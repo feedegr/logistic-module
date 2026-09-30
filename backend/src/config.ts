@@ -19,6 +19,11 @@ export const config = {
   auth: {
     jwtSecret: process.env.JWT_SECRET ?? '',
   },
+  chatwoot: {
+    databaseUrl: process.env.CHATWOOT_DATABASE_URL ?? '',
+    accountId: Number(process.env.CHATWOOT_ACCOUNT_ID ?? 1),
+    inboxId: Number(process.env.CHATWOOT_INBOX_ID ?? 1),
+  },
 }
 
 export function validateConfig(): void {
@@ -29,6 +34,7 @@ export function validateConfig(): void {
   if (!config.tango.accessToken) missing.push('TANGO_ACCESS_TOKEN')
   if (!config.axoft.apiKey) missing.push('AXOFT_API_KEY')
   if (!config.auth.jwtSecret) missing.push('JWT_SECRET')
+  if (!config.chatwoot.databaseUrl) missing.push('CHATWOOT_DATABASE_URL')
 
   if (missing.length > 0) {
     console.warn(
