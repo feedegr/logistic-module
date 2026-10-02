@@ -2,12 +2,13 @@ import { useState } from 'react'
 import ExcelGenerator from './components/ExcelGenerator'
 import DeudasView from './components/DeudasView'
 import ClientesView from './components/ClientesView'
+import MetricasView from './components/MetricasView'
 import HealthStatus from './components/HealthStatus'
 import LoginView from './components/LoginView'
 import { clearToken, getToken } from './api'
 import './App.css'
 
-type Tab = 'envios' | 'deudas' | 'clientes'
+type Tab = 'envios' | 'deudas' | 'clientes' | 'metricas'
 
 function App() {
   const [tab, setTab] = useState<Tab>('clientes')
@@ -44,6 +45,12 @@ function App() {
           >
             👥 Clientes
           </button>
+          <button
+            className={`tab ${tab === 'metricas' ? 'tab-active' : ''}`}
+            onClick={() => setTab('metricas')}
+          >
+            📊 Métricas
+          </button>
           <div className="tabs-spacer" />
           <HealthStatus />
           <button className="tab tab-logout" onClick={handleLogout}>
@@ -54,6 +61,7 @@ function App() {
         {tab === 'envios' && <ExcelGenerator />}
         {tab === 'deudas' && <DeudasView />}
         {tab === 'clientes' && <ClientesView />}
+        {tab === 'metricas' && <MetricasView />}
       </div>
     </div>
   )

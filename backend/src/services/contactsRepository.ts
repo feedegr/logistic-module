@@ -32,6 +32,7 @@ export interface Contact {
 
 export interface ContactUpdate {
   name?: string
+  phoneNormalized?: string
   address?: string | null
   city?: string | null
   billingCondition?: string | null
@@ -66,6 +67,7 @@ export async function updateContact(id: number, data: ContactUpdate): Promise<Co
   const { rows } = await pool.query<Contact>(
     `UPDATE contacts SET
       name               = COALESCE($2, name),
+      phone_normalized   = COALESCE($14, phone_normalized),
       address            = $3,
       city               = $4,
       billing_condition  = $5,
@@ -117,6 +119,7 @@ export async function updateContact(id: number, data: ContactUpdate): Promise<Co
       data.deliversFriday ?? null,
       data.deliversSaturday ?? null,
       data.deliversSunday ?? null,
+      data.phoneNormalized ?? null,
     ],
   )
   return rows[0] ?? null

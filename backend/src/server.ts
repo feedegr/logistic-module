@@ -7,6 +7,7 @@ import debtsRoutes from './routes/debts.js'
 import contactsRoutes from './routes/contacts.js'
 import botHealthRoutes from './routes/botHealth.js'
 import authRoutes from './routes/auth.js'
+import metricsRoutes from './routes/metrics.js'
 import { runMigrations } from './db/migrate.js'
 import { requireAuth } from './middleware/requireAuth.js'
 import pool from './db/pool.js'
@@ -32,6 +33,7 @@ app.use('/excel', requireAuth, excelRoutes)
 app.use('/debts', requireAuth, debtsRoutes)
 app.use('/contacts', requireAuth, contactsRoutes)
 app.use('/bot-health', requireAuth, botHealthRoutes)
+app.use('/metrics', requireAuth, metricsRoutes)
 
 runMigrations()
   .catch((err) => {
