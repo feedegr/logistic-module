@@ -54,26 +54,22 @@ const PRICE_LIST_OPTIONS = [
 
 const BILLING_CONDITION_OPTIONS = [
   { value: '', label: '—' },
-  { value: 'RI', label: 'RI - Responsable Inscripto' },
-  { value: 'MT', label: 'MT - Monotributo' },
-  { value: 'CF', label: 'CF - Consumidor Final' },
-  { value: 'EX', label: 'EX - Exento' },
+  { value: 'factura', label: 'factura' },
+  { value: 'factura_remito', label: 'factura_remito' },
+  { value: 'remito', label: 'remito' },
 ]
 
 function normalizeBillingCondition(value: string | null | undefined): string {
-  const raw = (value ?? '').trim().toUpperCase()
-  if (!raw) return ''
-  if (raw === 'RESPONSABLE INSCRIPTO' || raw === 'RI') return 'RI'
-  if (raw === 'MONOTRIBUTO' || raw === 'MT') return 'MT'
-  if (raw === 'CONSUMIDOR FINAL' || raw === 'CF') return 'CF'
-  if (raw === 'EXENTO' || raw === 'EX') return 'EX'
-  return raw
+  return (value ?? '').trim().toLowerCase()
+}
+
+function billingOptionsFor(current: string) {
+  const known = BILLING_CONDITION_OPTIONS.some((o) => o.value === current)
+  return known ? BILLING_CONDITION_OPTIONS : [...BILLING_CONDITION_OPTIONS, { value: current, label: current }]
 }
 
 function billingConditionLabel(value: string | null | undefined): string {
-  const normalized = normalizeBillingCondition(value)
-  const option = BILLING_CONDITION_OPTIONS.find((item) => item.value === normalized)
-  return option ? option.label : normalized || '—'
+  return normalizeBillingCondition(value) || '—'
 }
 
 function priceLabel(pl: string | null) {
@@ -347,7 +343,7 @@ export default function ClientesView() {
                           {isEditing
                             ? (
                               <select className="clientes-select" value={editState!.billingCondition} onChange={(e) => setEditState({ ...editState!, billingCondition: normalizeBillingCondition(e.target.value) })}>
-                                {BILLING_CONDITION_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                                {billingOptionsFor(editState!.billingCondition).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                               </select>
                             )
                             : billingConditionLabel(c.billingCondition)}
@@ -421,7 +417,7 @@ export default function ClientesView() {
               </label>
               <label>Condición de facturación
                 <select className="clientes-select" value={newContact.billingCondition} onChange={(e) => setNewContact({ ...newContact, billingCondition: normalizeBillingCondition(e.target.value) })}>
-                  {BILLING_CONDITION_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  {billingOptionsFor(newContact.billingCondition).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </label>
               <label>Lista de precios
